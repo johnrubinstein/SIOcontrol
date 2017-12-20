@@ -47,20 +47,19 @@ if __name__=='__main__':
 
     
     
-    #applysample(pin_cannon)
-    print "here"
+    # apply sample
     sample = threading.Thread(target=applysample, args=(pin_cannon,0,0.1))  # defines the thread
     sample.start()   # starts the thread
-    print "xxx"
-    
+
+    # release plunger
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,0.2))  # defines the thread
     plunger.start()
-    
-    #resetplunger(pin_plunger)
 
-    #cleancannon(pin_cannon)
 
-    GPIO.output(pin_cannon,GPIO.LOW)
+    # Exit with reset of plunger
+    raw_input("Press Enter to continue...")
+    resetplunger(pin_plunger)
+    #GPIO.output(pin_cannon,GPIO.LOW)
     
     print "Done!"
     
