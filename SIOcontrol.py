@@ -6,9 +6,10 @@ import RPi.GPIO as GPIO
 import Adafruit_DHT
 import time, threading
 
-def applysample(pin_cannon):
+def applysample(pin_cannon,wait,duration):
+    time.sleep(wait)
     GPIO.output(pin_canon,GPIO.HIGH)
-    time.sleep(0.1)
+    time.sleep(duration)
     GPIO.output(pin_cannon,GPIO.LOW)
 
 def cleancannon(pin_cannon):
@@ -18,7 +19,8 @@ def cleancannon(pin_cannon):
         GPIO.output(pin_cannon,GPIO.LOW)
         time.sleep(0.5)
     
-def releaseplunger(pin_plunger):
+def releaseplunger(pin_plunger,wait):
+    time.sleet(wait)
     GPIO.output(pin_plunger,GPIO.HIGH)
 
 def resetplunger(pin_plunger):
@@ -31,7 +33,7 @@ def readenvironment(pin_dht22):
 if __name__=='__main__':
     
     # Define pins
-    pin_cannon   = 12
+    pin_cannon  = 12
     pin_plunger = 19
     pin_dht22   = 24
     GPIO.setwarnings(False)
@@ -46,12 +48,15 @@ if __name__=='__main__':
     releaseplunger(pin_plunger)
     
     #applysample(pin_cannon)
-    t = threading.Thread(target=applysample, args=(pin_cannon))  # defines the thread
-    t.start()   # starts the thread
-    
-    resetplunger(pin_plunger)
+    sample = threading.Thread(target=applysample, args=(pin_cannon,0,0.1))  # defines the thread
+    sample.start()   # starts the thread
 
-    cleancannon(pin_cannon)
+    plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,0.2))  # defines the thread
+    plunger.start()
+    
+    #resetplunger(pin_plunger)
+
+    #cleancannon(pin_cannon)
 
     print "Done!"
     
