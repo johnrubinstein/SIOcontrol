@@ -5,6 +5,7 @@
 import RPi.GPIO as GPIO
 import Adafruit_DHT
 import time, threading
+import argparse
 
 def applysample(pin_cannon,wait,duration):
     time.sleep(wait)
@@ -31,35 +32,36 @@ def readenvironment(pin_dht22):
     return humidity, temperature
     
 if __name__=='__main__':
+    parser.add_argument('--stime',     help='Duration of sample application (seconds)',type=float,required=True)
+    parser.add_argument('--sdelay',    help='Time to wait before applying (seconds)',default = 0, type=float,required=False)
+    parser.add_argument('--pdelay',    help='Time to wait before plunging (seconds)',default = 0, type=float,required=False)
+    args = parser.parse_args()
+
     
     # Define pins
     pin_cannon  = 12
     pin_plunger = 19
     pin_dht22   = 24
-    GPIO.setwarnings(False)
-    GPIO.cleanup()
     
+    GPIO.setwarnings(False)
+    GPIO.cleanup()    
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
 
     #humidity, temperature = readenvironment(pin_dht22)
 
-    
-    
     # apply sample
-    sample = threading.Thread(target=applysample, args=(pin_cannon,0,0.1))  # defines the thread
+    sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  # defines the thread
     sample.start()   # starts the thread
 
     # release plunger
-    plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,0.2))  # defines the thread
+    plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  # defines the thread
     plunger.start()
-
 
     # Exit with reset of plunger
     raw_input("Press Enter to continue...")
     resetplunger(pin_plunger)
-    #GPIO.output(pin_cannon,GPIO.LOW)
     
     print "Done!"
     
