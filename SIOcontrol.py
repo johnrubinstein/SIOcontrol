@@ -32,6 +32,7 @@ def readenvironment(pin_dht22):
     return humidity, temperature
     
 if __name__=='__main__':
+    parser = argparse.ArgumentParser(description='Arguments for SIOcontrol')
     parser.add_argument('--stime',     help='Duration of sample application (seconds)',type=float,required=True)
     parser.add_argument('--sdelay',    help='Time to wait before applying (seconds)',default = 0, type=float,required=False)
     parser.add_argument('--pdelay',    help='Time to wait before plunging (seconds)',default = 0, type=float,required=False)
