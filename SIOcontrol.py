@@ -8,7 +8,7 @@ import time, threading
 
 def applysample(pin_cannon,wait,duration):
     time.sleep(wait)
-    GPIO.output(pin_canon,GPIO.HIGH)
+    GPIO.output(pin_cannon,GPIO.HIGH)
     time.sleep(duration)
     GPIO.output(pin_cannon,GPIO.LOW)
 
@@ -20,7 +20,7 @@ def cleancannon(pin_cannon):
         time.sleep(0.5)
     
 def releaseplunger(pin_plunger,wait):
-    time.sleet(wait)
+    time.sleep(wait)
     GPIO.output(pin_plunger,GPIO.HIGH)
 
 def resetplunger(pin_plunger):
@@ -43,14 +43,16 @@ if __name__=='__main__':
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
 
-    humidity, temperature = readenvironment(pin_dht22)
+    #humidity, temperature = readenvironment(pin_dht22)
 
-    releaseplunger(pin_plunger)
+    
     
     #applysample(pin_cannon)
+    print "here"
     sample = threading.Thread(target=applysample, args=(pin_cannon,0,0.1))  # defines the thread
     sample.start()   # starts the thread
-
+    print "xxx"
+    
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,0.2))  # defines the thread
     plunger.start()
     
@@ -58,6 +60,8 @@ if __name__=='__main__':
 
     #cleancannon(pin_cannon)
 
+    GPIO.output(pin_cannon,GPIO.LOW)
+    
     print "Done!"
     
 
