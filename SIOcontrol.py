@@ -50,16 +50,22 @@ if __name__=='__main__':
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
 
-    #humidity, temperature = readenvironment(pin_dht22)
+    # Report environmental conditions
+    humidity, temperature = readenvironment(pin_dht22)
+    print('{0:0.1f} Temp={1:0.1f}\'C  Humidity={2:0.1f}% RH'.format(tic-starttime,temperature, humidity))
 
-    # apply sample
+    # Breakpoint
+    raw_input("Press Enter to continue...")
+    
+    # set up processes
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  # defines the thread
-    sample.start()   # starts the thread
-
-    # release plunger
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  # defines the thread
-    plunger.start()
 
+    # start processes
+    plunger.start()  
+    sample.start()  
+
+    
     # Exit with reset of plunger
     raw_input("Press Enter to continue...")
     resetplunger(pin_plunger)
