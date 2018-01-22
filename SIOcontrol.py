@@ -64,7 +64,7 @@ if __name__=='__main__':
 
     # Exit with reset of plunger
     
-    print "Press Enter to continue [will time out if you don't]..."
+    print "Press Enter to continue [will time out in {0} seconds]...".format(timeout)
     i, o, e = select.select( [sys.stdin], [], [], timeout )
     if (i):
       print "Done!", sys.stdin.readline().strip()
