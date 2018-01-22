@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 import Adafruit_DHT
 import time, threading
 import argparse
+import sys, select
 
 def applysample(pin_cannon,wait,duration):
     time.sleep(wait)
@@ -34,6 +35,8 @@ if __name__=='__main__':
     pin_cannon  = 12
     pin_plunger = 19
     pin_dht22   = 24
+    timeout = 10      # withdraw the plunger to avoid overheating
+    
     
     GPIO.setwarnings(False)
     GPIO.cleanup()    
@@ -47,6 +50,9 @@ if __name__=='__main__':
 
     # Breakpoint
     raw_input("Press Enter to continue...")
+
+
+    
     
     # set up processes
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  
@@ -57,8 +63,15 @@ if __name__=='__main__':
     sample.start()  
 
     # Exit with reset of plunger
-    raw_input("Press Enter to continue...")
+    
+    print "Press Enter to continue [will time out if you don't]..."
+    i, o, e = select.select( [sys.stdin], [], [], timeout )
+    if (i):
+      print "Done!", sys.stdin.readline().strip()
+    else:
+      print "Time out!"
     resetplunger(pin_plunger)
+
     
     print "Done!"
     
