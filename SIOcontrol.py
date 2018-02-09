@@ -26,17 +26,18 @@ def readenvironment(pin_dht22):
     
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Arguments for SIOcontrol')
-    parser.add_argument('--stime',     help='Duration of sample application (seconds)',type=float,required=True)
-    parser.add_argument('--sdelay',    help='Time to wait before applying (seconds)',default = 0, type=float,required=False)
-    parser.add_argument('--pdelay',    help='Time to wait before plunging (seconds)',default = 0, type=float,required=False)
+    parser.add_argument('--stime',      help='Duration of sample application (seconds)',type=float,required=True)
+    parser.add_argument('--sdelay',     help='Time to wait before applying (seconds)',default = 0, type=float,required=False)
+    parser.add_argument('--pdelay',     help='Time to wait before plunging (seconds)',default = 0, type=float,required=False)
+    parser.add_argument('--donotplunge',help='Do not fire the plunger (diagnostic)',action = 'store_true')  
     args = parser.parse_args()
     
     # Define pins
     pin_cannon  = 12
     pin_plunger = 19
     pin_dht22   = 24
-    timeout = 10      # withdraw the plunger to avoid overheating
-    
+    timeout = 1     # withdraw the plunger to avoid overheating
+    kuhnketime = 1
     
     GPIO.setwarnings(False)
     GPIO.cleanup()    
@@ -59,18 +60,25 @@ if __name__=='__main__':
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  
 
     # start processes
-    plunger.start()  
+    if not args.donotplunge:
+        plunger.start()
+        
     sample.start()  
 
-    # Exit with reset of plunger
     
-    print "Press Enter to continue [will time out in {0} seconds]...".format(timeout)
-    i, o, e = select.select( [sys.stdin], [], [], timeout )
-    if (i):
-      print "Done!", sys.stdin.readline().strip()
-    else:
-      print "Time out!"
+
+    # Kuhnke plunger
+    time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
+    
+    # Exit with reset of plunger (not needed for Kuhnke plunger)
+    #print "Press Enter to continue [will time out in {0} seconds]...".format(timeout)
+    #i, o, e = select.select( [sys.stdin], [], [], timeout )
+    #if (i):
+    #  print "Done!", sys.stdin.readline().strip()
+    #else:
+    #  print "Time out!"
+    #resetplunger(pin_plunger)
 
     
     print "Done!"
