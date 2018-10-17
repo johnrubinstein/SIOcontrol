@@ -46,8 +46,8 @@ if __name__=='__main__':
     GPIO.setup(pin_plunger,GPIO.OUT)
 
     # Report environmental conditions
-    humidity, temperature = readenvironment(pin_dht22)
-    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
+#    humidity, temperature = readenvironment(pin_dht22)
+#    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
 
     # Breakpoint
     raw_input("Press Enter to continue...")
