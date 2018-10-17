@@ -8,11 +8,13 @@ import argparse
 import sys, select
 
 def cannonforward(pin_cannonposition):
+    print "Advancing the cannon"
     GPIO.output(pin_cannonposition,GPIO.HIGH)
 
-def cannonreverse(pin_cannonposition,cannonretreatdelay):
-    time.sleep(cannonretreatdelay)
-    GPIO.output(pin_cannonposition,GPIO.HIGH)
+def cannonreverse(pin_cannonposition,cannonreversedelay):
+    time.sleep(cannonreversedelay)
+    print "reversing the cannon"
+    GPIO.output(pin_cannonposition,GPIO.LOW)
 
 def applysample(pin_cannon,wait,duration):
     time.sleep(wait)
@@ -43,10 +45,10 @@ if __name__=='__main__':
     pin_cannon         = 12
     pin_plunger        = 19
     pin_dht22          = 24
-    pin_cannonposition = 21
+    pin_cannonposition = 20
 
     # Default timing
-    cannonretreatdelay = 0.1+args.pdelay
+    cannonreversedelay = 0.1+args.pdelay
     timeout            = 1     # withdraw the plunger to avoid overheating
     kuhnketime         = 1
     
@@ -55,7 +57,7 @@ if __name__=='__main__':
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
-
+    GPIO.setup(pin_cannonposition,GPIO.OUT)
     # Report environmental conditions
 #    humidity, temperature = readenvironment(pin_dht22)
 #    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
@@ -69,14 +71,15 @@ if __name__=='__main__':
     # set up processes
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  
-    plunger = threading.Thread(target=cannonreverse, args=(pin_cannonreverse,cannonreversedelay)) 
+    cannonposition = threading.Thread(target=cannonreverse, args=(pin_cannonposition,cannonreversedelay)) 
     
     # start processes
     if not args.donotplunge:
         plunger.start()
         
     sample.start()  
-
+    cannonposition.start()
+    
     # Kuhnke plunger
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
