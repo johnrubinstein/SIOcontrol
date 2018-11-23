@@ -16,6 +16,12 @@ def cannonreverse(pin_cannonposition,cannonreversedelay):
     print "reversing the cannon"
     GPIO.output(pin_cannonposition,GPIO.LOW)
 
+def timeprocess(pin_irsensor):
+    while GPIO.input(pin_irsensor)==1:
+        # just wait
+    tic=time.time()
+    return tic        
+        
 def applysample(pin_cannon,wait,duration):
     time.sleep(wait)
     GPIO.output(pin_cannon,GPIO.HIGH)
@@ -45,6 +51,7 @@ if __name__=='__main__':
     pin_plunger        = 19
     pin_dht22          = 24
     pin_cannonposition = 20
+    pin_irsensor       = 26
 
     # Default timing
     cannontimetoreverse = 0.05
@@ -58,6 +65,9 @@ if __name__=='__main__':
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
     GPIO.setup(pin_cannonposition,GPIO.OUT)
+    GPIO.setup(pin_cannonposition,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+
+    
     # Report environmental conditions
 #    humidity, temperature = readenvironment(pin_dht22)
 #    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
@@ -80,7 +90,11 @@ if __name__=='__main__':
     # set up processes
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  
-    cannonposition = threading.Thread(target=cannonreverse, args=(pin_cannonposition,cannonreversedelay)) 
+    cannonposition = threading.Thread(target=cannonreverse, args=(pin_cannonposition,cannonreversedelay))
+    clockit = threading.Thread(target=timeprocess, args=(pin_irsensor))
+    
+
+  
     
     # start processes
     if not args.donotplunge:
@@ -92,7 +106,11 @@ if __name__=='__main__':
     # Kuhnke plunger
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
-    
+
+
+    print tic
+    toc = time.time()
+    print toc-tic
     print "Done!"
     
 
