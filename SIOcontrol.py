@@ -47,7 +47,7 @@ if __name__=='__main__':
     pin_cannonposition = 20
 
     # Default timing
-    cannontimetoreverse = 0.05
+    cannontimetoreverse = 0.000
     cannonreversedelay  = args.stime + args.sdelay+ cannontimetoreverse
     timeout             = 1     # withdraw the plunger to avoid overheating
     kuhnketime          = 1
