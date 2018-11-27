@@ -16,11 +16,18 @@ def cannonreverse(pin_cannonposition,cannonreversedelay):
     print "reversing the cannon"
     GPIO.output(pin_cannonposition,GPIO.LOW)
 
-def timeprocess(pin_irsensor):
-    while GPIO.input(pin_irsensor)==1:
-        # just wait
-    tic=time.time()
-    return tic        
+def timeprocess(pin_irsensor,tic):
+    tic = time.time()
+    print "in"
+    print GPIO.input(pin_irsensor)
+    while GPIO.input(pin_irsensor)==0:
+        pass
+    toc=time.time()
+    print "out"
+    print GPIO.input(pin_irsensor)
+    total = toc - tic
+    print "Time from start to immersion:", total
+
         
 def applysample(pin_cannon,wait,duration):
     time.sleep(wait)
@@ -65,13 +72,16 @@ if __name__=='__main__':
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
     GPIO.setup(pin_cannonposition,GPIO.OUT)
-    GPIO.setup(pin_cannonposition,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    GPIO.setup(pin_irsensor,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
     
     # Report environmental conditions
 #    humidity, temperature = readenvironment(pin_dht22)
 #    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
-    
+
+
+    print GPIO.input(pin_irsensor)
+
     # Display timing and avoid crash
     print "Timings:"
     print "Specimen application will start at time: ",args.sdelay
@@ -88,12 +98,13 @@ if __name__=='__main__':
     raw_input("Press Enter to continue...")
 
     # set up processes
+    tic=0.0
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  
     cannonposition = threading.Thread(target=cannonreverse, args=(pin_cannonposition,cannonreversedelay))
-    clockit = threading.Thread(target=timeprocess, args=(pin_irsensor))
+    clockit = threading.Thread(target=timeprocess, args=(pin_irsensor,tic))
     
-
+  
   
     
     # start processes
@@ -102,17 +113,15 @@ if __name__=='__main__':
         
     sample.start()  
     cannonposition.start()
+    clockit.start()
     
     # Kuhnke plunger
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
-
-
-    print tic
-    toc = time.time()
-    print toc-tic
     print "Done!"
     
-
     
 
+    
+    
+    print GPIO.input(pin_irsensor)
