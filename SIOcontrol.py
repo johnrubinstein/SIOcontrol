@@ -18,13 +18,13 @@ def cannonreverse(pin_cannonposition,cannonreversedelay):
 
 def timeprocess(pin_irsensor,tic):
     tic = time.time()
-    print "in"
-    print GPIO.input(pin_irsensor)
+    #print "in"
+    #print GPIO.input(pin_irsensor)
     while GPIO.input(pin_irsensor)==0:
         pass
     toc=time.time()
-    print "out"
-    print GPIO.input(pin_irsensor)
+    #print "out"
+    #print GPIO.input(pin_irsensor)
     total = toc - tic
     print "Time from start to immersion:", total
 
@@ -104,9 +104,6 @@ if __name__=='__main__':
     cannonposition = threading.Thread(target=cannonreverse, args=(pin_cannonposition,cannonreversedelay))
     clockit = threading.Thread(target=timeprocess, args=(pin_irsensor,tic))
     
-  
-  
-    
     # start processes
     if not args.donotplunge:
         plunger.start()
@@ -119,9 +116,4 @@ if __name__=='__main__':
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
     print "Done!"
-    
-    
-
-    
-    
-    print GPIO.input(pin_irsensor)
+    #print GPIO.input(pin_irsensor)
