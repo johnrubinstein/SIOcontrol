@@ -54,12 +54,15 @@ if __name__=='__main__':
     parser.add_argument('--donotplunge',help='Do not fire the plunger (diagnostic)',action = 'store_true')  
     args = parser.parse_args()
     # Define pins
-    pin_cannon         = 12
+    pin_cannon         = 25 ##
     pin_plunger        = 19
     pin_dht22          = 24
-    pin_cannonposition = 20
-    pin_irsensor       = 26
+    pin_cannonposition = 26
+    pin_sensorpower    = 12 ##
+    pin_irsensor       = 16 
 
+
+    
     # Default timing
     cannontimetoreverse = 0.000
     cannonreversedelay  = args.stime + args.sdelay+ cannontimetoreverse
@@ -110,7 +113,7 @@ if __name__=='__main__':
         
     sample.start()  
     cannonposition.start()
-    clockit.start()
+    #clockit.start()
     
     # Kuhnke plunger
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
