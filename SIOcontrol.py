@@ -11,16 +11,25 @@ def cannonforward(pin_cannonposition):
     print "Advancing the cannon"
     GPIO.output(pin_cannonposition,GPIO.HIGH)
 
+
+def powerupsensors(pin_sensorpower):
+    GPIO.output(pin_sensorpower,GPIO.HIGH)
+
+def powerdownsensors(pin_sensorpower):
+    GPIO.output(pin_sensorpower,GPIO.LOW)
+    
 def cannonreverse(pin_cannonposition,cannonreversedelay):
     time.sleep(cannonreversedelay)
     print "reversing the cannon"
     GPIO.output(pin_cannonposition,GPIO.LOW)
 
-def timeprocess(pin_irsensor,tic):
+def timeprocess(pin_irsensor,exittime):
     tic = time.time()
     #print "in"
     #print GPIO.input(pin_irsensor)
-    while GPIO.input(pin_irsensor)==0:
+    print '***',exittime
+    
+    while GPIO.input(pin_irsensor)==0 and time.time()-tic<exittime:
         pass
     toc=time.time()
     #print "out"
@@ -75,6 +84,7 @@ if __name__=='__main__':
     GPIO.setup(pin_cannon,GPIO.OUT)
     GPIO.setup(pin_plunger,GPIO.OUT)
     GPIO.setup(pin_cannonposition,GPIO.OUT)
+    GPIO.setup(pin_sensorpower,GPIO.OUT)
     GPIO.setup(pin_irsensor,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
     
@@ -83,29 +93,29 @@ if __name__=='__main__':
 #    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
 
 
-    print GPIO.input(pin_irsensor)
-
+    
     # Display timing and avoid crash
     print "Timings:"
     print "Specimen application will start at time: ",args.sdelay
     print "Specimen application will end at time: ",args.sdelay + args.stime
     print "Cannon will reverse at time: ",cannonreversedelay
     print "Plunger will fall at time: ",args.pdelay
-    print "Program will exit after: ",kuhnketime+args.pdelay+args.sdelay
+    exittime = kuhnketime+args.pdelay+args.sdelay
+    print "Program will exit after: ",exittime
     if cannonreversedelay > args.pdelay:
         print "The cannon does not have sufficient time to reverse before plunging!!"
         exit()
 
     # put cannon into place and wait
     cannonforward(pin_cannonposition)
+    powerupsensors(pin_sensorpower)
     raw_input("Press Enter to continue...")
 
     # set up processes
-    tic=0.0
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  
     plunger = threading.Thread(target=releaseplunger, args=(pin_plunger,args.pdelay))  
     cannonposition = threading.Thread(target=cannonreverse, args=(pin_cannonposition,cannonreversedelay))
-    clockit = threading.Thread(target=timeprocess, args=(pin_irsensor,tic))
+    clockit = threading.Thread(target=timeprocess, args=(pin_irsensor,exittime))
     
     # start processes
     if not args.donotplunge:
@@ -113,10 +123,11 @@ if __name__=='__main__':
         
     sample.start()  
     cannonposition.start()
-    #clockit.start()
+    clockit.start()
     
     # Kuhnke plunger
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
+    powerdownsensors(pin_sensorpower)
     print "Done!"
     #print GPIO.input(pin_irsensor)
