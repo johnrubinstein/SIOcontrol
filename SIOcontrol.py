@@ -68,7 +68,8 @@ if __name__=='__main__':
     pin_dht22          = 24
     pin_cannonposition = 26
     pin_sensorpower    = 12 ##
-    pin_irsensor       = 16 
+    pin_irsensor       = 16
+    pin_interlock      = 27
 
 
     
@@ -86,14 +87,17 @@ if __name__=='__main__':
     GPIO.setup(pin_cannonposition,GPIO.OUT)
     GPIO.setup(pin_sensorpower,GPIO.OUT)
     GPIO.setup(pin_irsensor,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-
+    GPIO.setup(pin_interlock,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    
     
     # Report environmental conditions
 #    humidity, temperature = readenvironment(pin_dht22)
 #    print('Temp={0:0.1f}\'C  Humidity={1:0.1f}% RH'.format(temperature, humidity))
 
 
-    
+
+
+
     # Display timing and avoid crash
     print "Timings:"
     print "Specimen application will start at time: ",args.sdelay
@@ -106,9 +110,18 @@ if __name__=='__main__':
         print "The cannon does not have sufficient time to reverse before plunging!!"
         exit()
 
-    # put cannon into place and wait
-    cannonforward(pin_cannonposition)
+    # Power up sensors and check interlock
     powerupsensors(pin_sensorpower)
+    if GPIO.input(pin_interlock)==1:
+        print "Interlock fail: cryogen container is not in place"
+        powerdownsensors(pin_sensorpower)
+        exit()
+    else:
+        print "Safety interlock pass: cryogen container is in place"
+
+     # put cannon into place and wait
+    cannonforward(pin_cannonposition)
+    
     raw_input("Press Enter to continue...")
 
     # set up processes
