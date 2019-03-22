@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Uncomment for use of pi
 import RPi.GPIO as GPIO
@@ -8,7 +8,7 @@ import argparse
 import sys, select
 
 def cannonforward(pin_cannonposition):
-    print "Advancing the cannon"
+    print("Advancing the cannon")
     GPIO.output(pin_cannonposition,GPIO.HIGH)
 
 
@@ -20,22 +20,20 @@ def powerdownsensors(pin_sensorpower):
     
 def cannonreverse(pin_cannonposition,cannonreversedelay):
     time.sleep(cannonreversedelay)
-    print "reversing the cannon"
+    print("reversing the cannon")
     GPIO.output(pin_cannonposition,GPIO.LOW)
 
 def timeprocess(pin_irsensor,exittime):
     tic = time.time()
-    #print "in"
-    #print GPIO.input(pin_irsensor)
-    print '***',exittime
+    print('***',exittime)
     
     while GPIO.input(pin_irsensor)==0 and time.time()-tic<exittime:
         pass
     toc=time.time()
-    #print "out"
+
     #print GPIO.input(pin_irsensor)
     total = toc - tic
-    print "Time from start to immersion:", total
+    print("Time from start to immersion:", total)
 
         
 def applysample(pin_cannon,wait,duration):
@@ -99,30 +97,30 @@ if __name__=='__main__':
 
 
     # Display timing and avoid crash
-    print "Timings:"
-    print "Specimen application will start at time: ",args.sdelay
-    print "Specimen application will end at time: ",args.sdelay + args.stime
-    print "Cannon will reverse at time: ",cannonreversedelay
-    print "Plunger will fall at time: ",args.pdelay
+    print("Timings:")
+    print("Specimen application will start at time: ",args.sdelay
+    print("Specimen application will end at time: ",args.sdelay + args.stime
+    print("Cannon will reverse at time: ",cannonreversedelay
+    print("Plunger will fall at time: ",args.pdelay)
     exittime = kuhnketime+args.pdelay+args.sdelay
-    print "Program will exit after: ",exittime
+    print("Program will exit after: ",exittime)
     if cannonreversedelay > args.pdelay:
-        print "The cannon does not have sufficient time to reverse before plunging!!"
+        print("The cannon does not have sufficient time to reverse before plunging!!")
         exit()
 
     # Power up sensors and check interlock
     powerupsensors(pin_sensorpower)
     if GPIO.input(pin_interlock)==1:
-        print "Interlock fail: cryogen container is not in place"
+        print("Interlock fail: cryogen container is not in place")
         powerdownsensors(pin_sensorpower)
         exit()
     else:
-        print "Safety interlock pass: cryogen container is in place"
+        print("Safety interlock pass: cryogen container is in place")
 
      # put cannon into place and wait
     cannonforward(pin_cannonposition)
     
-    raw_input("Press Enter to continue...")
+    input("Press Enter to continue...")
 
     # set up processes
     sample = threading.Thread(target=applysample, args=(pin_cannon,args.sdelay,args.stime))  
@@ -142,5 +140,5 @@ if __name__=='__main__':
     time.sleep(kuhnketime+args.pdelay+args.sdelay)
     resetplunger(pin_plunger)
     powerdownsensors(pin_sensorpower)
-    print "Done!"
+    print("Done!")
     #print GPIO.input(pin_irsensor)
