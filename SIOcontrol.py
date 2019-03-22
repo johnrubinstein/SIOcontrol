@@ -98,9 +98,9 @@ if __name__=='__main__':
 
     # Display timing and avoid crash
     print("Timings:")
-    print("Specimen application will start at time: ",args.sdelay
-    print("Specimen application will end at time: ",args.sdelay + args.stime
-    print("Cannon will reverse at time: ",cannonreversedelay
+    print("Specimen application will start at time: ",args.sdelay)
+    print("Specimen application will end at time: ",args.sdelay + args.stime)
+    print("Cannon will reverse at time: ",cannonreversedelay)
     print("Plunger will fall at time: ",args.pdelay)
     exittime = kuhnketime+args.pdelay+args.sdelay
     print("Program will exit after: ",exittime)
