@@ -42,6 +42,7 @@ if __name__=='__main__':
         if GPIO.input(pin.interlock)==1:
             print("Interlock fail: cryogen container is not in place")
             powerdownsensors(pin.sensorpower)
+            cannonreverse(pin.cannonposition,0)
             exit()
         else:
             print("Safety interlock pass: cryogen container is in place")
