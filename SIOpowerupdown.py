@@ -5,22 +5,22 @@ import RPi.GPIO as GPIO
 import time, threading
 import argparse
 import sys, select
-import SIOpinlist
+import SIOpinlist as pin
 
-def cannonforward(pin.cannonposition):
+def cannonforward(cannonposition):
     print("Advancing the cannon")
-    GPIO.output(pin.cannonposition,GPIO.HIGH)
+    GPIO.output(cannonposition,GPIO.HIGH)
 
-def powerupsensors(pin.sensorpower):
-    GPIO.output(pin.sensorpower,GPIO.HIGH)
+def powerupsensors(sensorpower):
+    GPIO.output(sensorpower,GPIO.HIGH)
 
-def powerdownsensors(pin.sensorpower):
-    GPIO.output(pin.sensorpower,GPIO.LOW)
+def powerdownsensors(sensorpower):
+    GPIO.output(sensorpower,GPIO.LOW)
     
-def cannonreverse(pin.cannonposition,cannonreversedelay):
+def cannonreverse(cannonposition,cannonreversedelay):
     time.sleep(cannonreversedelay)
     print("reversing the cannon")
-    GPIO.output(pin.cannonposition,GPIO.LOW)
+    GPIO.output(cannonposition,GPIO.LOW)
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description='Arguments for SIOpowerupdown')
@@ -32,7 +32,10 @@ if __name__=='__main__':
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(pin.cannonposition,GPIO.OUT)
     GPIO.setup(pin.sensorpower,GPIO.OUT)
-
+    GPIO.setup(pin.sensorpower,GPIO.OUT)
+    GPIO.setup(pin.irsensor,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    GPIO.setup(pin.interlock,GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+    
     if args.updown == 'up':
         # Power up sensors and check interlock
         powerupsensors(pin.sensorpower)
@@ -41,10 +44,11 @@ if __name__=='__main__':
             powerdownsensors(pin.sensorpower)
             exit()
         else:
-        print("Safety interlock pass: cryogen container is in place")
-        # put cannon into place and wait
-        cannonforward(pin.cannonposition)
-    else if args.updown == 'down':
+            print("Safety interlock pass: cryogen container is in place")
+            # put cannon into place and wait
+            cannonforward(pin.cannonposition)
+    elif args.updown == 'down':
+        powerdownsensors(pin.sensorpower)
         cannonreverse(pin.cannonposition,0)
     print("Done!")
 
