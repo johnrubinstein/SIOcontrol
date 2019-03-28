@@ -11,6 +11,7 @@ def startprocess():
     if donotplunge.value==1:
         arguments.append("--donotplunge")
     call(arguments)
+    button_start.disable()
     
 def powerup():
     print("Power up")
@@ -28,7 +29,7 @@ def cleanprocess():
     print("starting clean process")
     spraytime  = str(float(cleantime.value)/1000)
     cycles = cleancycles.value
-    arguments = ["python3","cleancontrol.py","--stime",spraytime,"--cycles",cycles]
+    arguments = ["python3","SIOclean.py","--stime",spraytime,"--cycles",cycles]
     #print(arguments)
     #call(arguments)
     Popen(arguments)
@@ -40,9 +41,10 @@ stime       = TextBox(app, grid=[1,1], text="5")
 pdelaylabel = Text(app, text="Plunge delay (ms)", grid=[0,2])
 pdelay      = TextBox(app, grid=[1,2], text="5")
 donotplunge = CheckBox(app, text="Do not plunge", grid=[0,3])
-button_up   = PushButton(app, command=powerup,text="On", grid=[0,4])
-button_down = PushButton(app, command=powerdown, text="Off", grid=[1,4])
-button_start= PushButton(app, command=startprocess, text="Start Process", grid=[0,5])
+button_up   = PushButton(app, command=powerup,text="Ready", grid=[0,4])
+button_down = PushButton(app, command=powerdown, text="Abort", grid=[1,4])
+button_start= PushButton(app, command=startprocess, text="Spray & Plunge", grid=[0,5])
+button_up.bg="orange"
 button_start.bg = "red"
 button_start.disable()
 
