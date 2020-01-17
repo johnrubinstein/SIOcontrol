@@ -89,9 +89,9 @@ if __name__=='__main__':
     print("Plunger will fall at time: ",args.pdelay)
     exittime = kuhnketime+args.pdelay+args.sdelay
     print("Program will exit after: ",exittime)
-    if cannonreversedelay > args.pdelay:
-        print("The cannon does not have sufficient time to reverse before plunging!!")
-        exit()
+    #if cannonreversedelay > args.pdelay:
+    #    print("The cannon does not have sufficient time to reverse before plunging!!")
+    #    exit()
 
     # Check interlock
     if GPIO.input(pin.interlock)==1:
